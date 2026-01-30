@@ -1,0 +1,498 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  color: #1e293b;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Leaflet Map Customizations */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Marker Styles */
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.custom-marker:hover {
+  transform: scale(1.15);
+}
+
+.custom-marker.priority-low {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.custom-marker.priority-medium {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.custom-marker.priority-high {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.custom-marker.priority-urgent {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  animation: pulse-urgent 2s infinite;
+}
+
+@keyframes pulse-urgent {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.7);
+  }
+}
+
+/* Glass Morphism Effects */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(30, 41, 59, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button Styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold 
+         py-3 px-6 rounded-xl shadow-lg hover:shadow-xl 
+         transition-all duration-300 ease-out
+         hover:from-primary-700 hover:to-primary-800
+         active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-white text-gray-700 font-medium py-3 px-6 rounded-xl 
+         border border-gray-200 shadow-sm hover:shadow-md 
+         transition-all duration-300 ease-out
+         hover:bg-gray-50 active:scale-95;
+}
+
+.btn-danger {
+  @apply bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold 
+         py-3 px-6 rounded-xl shadow-lg hover:shadow-xl 
+         transition-all duration-300 ease-out
+         hover:from-red-600 hover:to-red-700 active:scale-95;
+}
+
+.btn-success {
+  @apply bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold 
+         py-3 px-6 rounded-xl shadow-lg hover:shadow-xl 
+         transition-all duration-300 ease-out
+         hover:from-green-600 hover:to-green-700 active:scale-95;
+}
+
+/* Card Styles */
+.card {
+  @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover 
+         transition-all duration-300 ease-out overflow-hidden;
+}
+
+.card-glass {
+  @apply glass rounded-2xl shadow-glass overflow-hidden;
+}
+
+/* Input Styles */
+.input {
+  @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+         text-gray-900 placeholder-gray-400
+         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+         transition-all duration-200;
+}
+
+.input-error {
+  @apply border-red-300 focus:ring-red-500;
+}
+
+/* Badge Styles */
+.badge {
+  @apply inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm;
+}
+
+.badge-open {
+  @apply bg-blue-500/95 text-white border border-blue-600/50;
+}
+
+.badge-in-progress {
+  @apply bg-yellow-500/95 text-white border border-yellow-600/50;
+}
+
+.badge-resolved {
+  @apply bg-green-500/95 text-white border border-green-600/50;
+}
+
+.badge-urgent {
+  @apply bg-red-100 text-red-800 animate-pulse;
+}
+
+/* Priority Badges */
+.priority-low {
+  @apply bg-green-500/95 text-white border border-green-600/50;
+}
+
+.priority-medium {
+  @apply bg-yellow-500/95 text-white border border-yellow-600/50;
+}
+
+.priority-high {
+  @apply bg-orange-500/95 text-white border border-orange-600/50;
+}
+
+.priority-urgent {
+  @apply bg-red-500/95 text-white border border-red-600/50 animate-pulse;
+}
+
+/* Category Icons */
+.category-icon {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center;
+}
+
+.category-pothole {
+  @apply bg-orange-100 text-orange-600;
+}
+
+.category-trash {
+  @apply bg-green-100 text-green-600;
+}
+
+.category-streetlight {
+  @apply bg-yellow-100 text-yellow-600;
+}
+
+.category-hazard {
+  @apply bg-red-100 text-red-600;
+}
+
+.category-graffiti {
+  @apply bg-purple-100 text-purple-600;
+}
+
+.category-road_damage {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.category-other {
+  @apply bg-blue-100 text-blue-600;
+}
+
+/* Floating Action Button */
+.fab {
+  @apply fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg
+         bg-gradient-to-r from-primary-600 to-primary-700
+         flex items-center justify-center text-white
+         transition-all duration-300 ease-out
+         hover:shadow-xl hover:scale-110 active:scale-95 z-50;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50
+         flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+}
+
+/* Slide Panel */
+.slide-panel {
+  @apply fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-50
+         transform transition-transform duration-300 ease-out;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin;
+}
+
+/* Toast Customizations */
+.toast-success {
+  @apply bg-green-500 text-white;
+}
+
+.toast-error {
+  @apply bg-red-500 text-white;
+}
+
+/* PWA Install Banner */
+.pwa-banner {
+  @apply fixed bottom-0 left-0 right-0 bg-gradient-to-r from-primary-600 to-primary-700
+         text-white p-4 shadow-lg z-50;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Safe Area for Mobile */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Animation Classes for GSAP */
+.fade-in {
+  opacity: 0;
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.slide-right {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.scale-in {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Offline Indicator */
+.offline-banner {
+  @apply fixed top-0 left-0 right-0 bg-amber-500 text-white text-center py-2 
+         text-sm font-medium z-[9999] safe-area-top;
+}
+
+/* Photo Upload Preview */
+.photo-preview {
+  @apply relative w-full aspect-video rounded-xl overflow-hidden bg-gray-100
+         border-2 border-dashed border-gray-300 
+         flex items-center justify-center cursor-pointer
+         hover:border-primary-500 hover:bg-gray-50 transition-all duration-200;
+}
+
+.photo-preview.has-image {
+  @apply border-solid border-transparent;
+}
+
+/* Chat Bubble Styles */
+.chat-bubble {
+  @apply rounded-2xl px-4 py-2;
+  max-width: 280px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.chat-bubble-own {
+  @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.chat-bubble-other {
+  @apply bg-white text-gray-800 shadow-sm;
+  border-radius: 18px 18px 18px 4px;
+}
+
+/* Chat Background Pattern - WhatsApp Style */
+.chat-background {
+  background-color: #e5ddd5;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9c2b8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Modern Chat Background - Alternative */
+.chat-background-modern {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+}
+
+/* Glass Sidebar Styles */
+.sidebar-glass {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-item {
+  @apply w-12 h-12 rounded-xl flex items-center justify-center 
+         transition-all duration-300 ease-out cursor-pointer;
+  background: transparent;
+}
+
+.sidebar-item:hover {
+  @apply bg-gray-100;
+  transform: scale(1.05);
+}
+
+.sidebar-item.active {
+  @apply bg-gradient-to-r from-primary-500 to-primary-600;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+.sidebar-icon {
+  @apply transition-colors duration-200;
+}
+
+.sidebar-tooltip {
+  @apply absolute left-full ml-3 px-3 py-1.5 rounded-lg text-sm font-medium
+         bg-gray-900 text-white whitespace-nowrap opacity-0 pointer-events-none
+         transition-all duration-200;
+  transform: translateX(-10px);
+}
+
+.sidebar-item:hover .sidebar-tooltip {
+  @apply opacity-100;
+  transform: translateX(0);
+}
+
+/* Slide Panel Styles */
+.slide-panel-left {
+  @apply fixed left-0 top-0 w-full sm:w-96 z-[90];
+  bottom: 70px;
+}
+
+@media (min-width: 768px) {
+  .slide-panel-left {
+    bottom: 0;
+  }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Brand */
+.glass-brand {
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Glass Legend */
+.glass-legend {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Report Card Mini */
+.report-card-mini {
+  @apply bg-white rounded-xl p-3 transition-all duration-200;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.report-card-mini:hover {
+  @apply shadow-md;
+  transform: translateY(-2px);
+}
+
+/* Photo Preview Compact */
+.photo-preview-compact {
+  @apply relative w-full h-32 rounded-xl overflow-hidden bg-gray-100
+         border-2 border-dashed border-gray-300 
+         flex items-center justify-center cursor-pointer
+         hover:border-primary-500 hover:bg-gray-50 transition-all duration-200;
+}
+
+.photo-preview-compact.has-image {
+  @apply border-solid border-transparent;
+}
+
+/* Responsive Utilities */
+@media (max-width: 640px) {
+  .leaflet-popup-content {
+    min-width: 240px;
+    max-width: 280px;
+  }
+  
+  .slide-panel-left {
+    width: 100%;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

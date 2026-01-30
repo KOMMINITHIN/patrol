@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)" />
+  <!-- Road -->
+  <path d="M20 70 Q35 55 50 50 Q65 45 80 30" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Road markings -->
+  <path d="M32 62 Q42 52 50 50" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4,4"/>
+  <path d="M50 50 Q58 48 68 38" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4,4"/>
+  <!-- Location pin -->
+  <g transform="translate(45, 20)">
+    <path d="M10 0 C4.5 0 0 4.5 0 10 C0 17.5 10 25 10 25 C10 25 20 17.5 20 10 C20 4.5 15.5 0 10 0 Z" fill="white"/>
+    <circle cx="10" cy="10" r="5" fill="#EF4444"/>
+  </g>
+</svg>
