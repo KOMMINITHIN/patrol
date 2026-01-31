@@ -175,25 +175,8 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
     // Fetch initial reports
     fetchReports({ excludeResolved: true });
 
-    // Get user location using optimized service (if not already provided)
-    if (!userLocationProp) {
-      getCurrentLocation()
-        .then((location) => {
-          setUserLocation({
-            lat: location.lat,
-            lng: location.lng,
-          });
-          // Fly to user on initial load
-          if (!hasInitialFlyRef.current) {
-            hasInitialFlyRef.current = true;
-            setShouldFlyToUser(true);
-          }
-        })
-        .catch((error) => {
-          console.log('Geolocation error:', error.message);
-        });
-    }
-  }, [userLocationProp]);
+    // Don't automatically fetch location - let LocationPermissionPrompt handle it
+  }, []);
 
   const handleMapClick = (latlng) => {
     if (selectionMode && onLocationSelect) {
@@ -341,7 +324,10 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
           <FlyToLocation 
             location={userLocation} 
             shouldFly={shouldFlyToUser} 
-            onAnimationEnd={() => setIsAnimating(false)}
+            onAnimationEnd={() => {
+              setIsAnimating(false);
+              setShouldFlyToUser(false); // Reset after fly completes
+            }}
           />
         )}
       </MapContainer>

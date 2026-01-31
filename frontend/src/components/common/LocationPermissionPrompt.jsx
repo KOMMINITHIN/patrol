@@ -7,6 +7,7 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
   const [permissionState, setPermissionState] = useState('unknown');
   const watchIdRef = useRef(null);
   const hasGrantedRef = useRef(false);
+  const hasCalledOnLocationGrantedRef = useRef(false);
 
   // Start watching location for continuous updates
   const startLocationWatch = () => {
@@ -19,7 +20,8 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
     
     watchIdRef.current = watchLocation(
       (location) => {
-        if (onLocationGranted) onLocationGranted(location);
+        // Dispatch event for continuous location updates (marker updates)
+        window.dispatchEvent(new CustomEvent('userLocationUpdated', { detail: location }));
       },
       (error) => {
         console.log('Watch location error:', error);
@@ -77,7 +79,10 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
             // Already have permission, start watching location
             try {
               const location = await getCurrentLocation({ forceRefresh: true });
-              if (onLocationGranted) onLocationGranted(location);
+              if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
+                hasCalledOnLocationGrantedRef.current = true;
+                onLocationGranted(location);
+              }
               // Start continuous watch
               startLocationWatch();
             } catch (err) {
@@ -90,7 +95,10 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
             if (isMobile) {
               try {
                 const location = await getCurrentLocation({ forceRefresh: true });
-                if (onLocationGranted) onLocationGranted(location);
+                if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
+                  hasCalledOnLocationGrantedRef.current = true;
+                  onLocationGranted(location);
+                }
                 startLocationWatch();
                 return;
               } catch (err) {
@@ -102,7 +110,10 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
               // On desktop, try to get location directly (browser will show its own prompt)
               try {
                 const location = await getCurrentLocation({ forceRefresh: true });
-                if (onLocationGranted) onLocationGranted(location);
+                if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
+                  hasCalledOnLocationGrantedRef.current = true;
+                  onLocationGranted(location);
+                }
                 startLocationWatch();
               } catch (err) {
                 console.log('Desktop location error:', err);
@@ -119,7 +130,10 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
           if (isMobile) {
             try {
               const location = await getCurrentLocation({ forceRefresh: true });
-              if (onLocationGranted) onLocationGranted(location);
+              if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
+                hasCalledOnLocationGrantedRef.current = true;
+                onLocationGranted(location);
+              }
               startLocationWatch();
               return;
             } catch (err) {
@@ -152,7 +166,10 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
       setPermissionState('granted');
       hasGrantedRef.current = true;
       setShowPrompt(false);
-      if (onLocationGranted) onLocationGranted(location);
+      if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
+        hasCalledOnLocationGrantedRef.current = true;
+        onLocationGranted(location);
+      }
       // Start continuous location watching
       startLocationWatch();
     } catch (err) {
