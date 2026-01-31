@@ -12,6 +12,11 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
   const startLocationWatch = () => {
     if (watchIdRef.current) return; // Already watching
     
+    const isMobile = window.innerWidth < 768 || 
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    
     watchIdRef.current = watchLocation(
       (location) => {
         if (onLocationGranted) onLocationGranted(location);
@@ -19,7 +24,13 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
       (error) => {
         console.log('Watch location error:', error);
       },
-      { highAccuracy: true }
+      { 
+        highAccuracy: true,
+        // Use longer timeout on mobile for better GPS acquisition
+        timeout: isMobile ? 15000 : 10000,
+        // Allow cached positions on mobile to reduce battery drain
+        maximumAge: isMobile ? 30000 : 10000
+      }
     );
   };
 
@@ -74,10 +85,19 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
             }
             return;
           } else if (permission.state === 'prompt') {
-            // Need to ask for permission - show prompt on mobile/PWA
+            // On mobile/PWA, try to get location directly first (like desktop)
+            // Only show prompt if location request fails
             if (isMobile) {
-              // Delay slightly to let the app render first
-              setTimeout(() => setShowPrompt(true), 500);
+              try {
+                const location = await getCurrentLocation({ forceRefresh: true });
+                if (onLocationGranted) onLocationGranted(location);
+                startLocationWatch();
+                return;
+              } catch (err) {
+                console.log('Mobile location request failed, showing prompt:', err);
+                // Delay slightly to let the app render first
+                setTimeout(() => setShowPrompt(true), 500);
+              }
             } else {
               // On desktop, try to get location directly (browser will show its own prompt)
               try {
@@ -95,8 +115,19 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
             }
           }
         } else {
-          // Permissions API not available, show prompt on mobile
+          // Permissions API not available, try to get location directly on mobile too
           if (isMobile) {
+            try {
+              const location = await getCurrentLocation({ forceRefresh: true });
+              if (onLocationGranted) onLocationGranted(location);
+              startLocationWatch();
+              return;
+            } catch (err) {
+              console.log('Mobile location fallback failed, showing prompt:', err);
+              setTimeout(() => setShowPrompt(true), 500);
+            }
+          } else {
+            // Show prompt as fallback on desktop
             setTimeout(() => setShowPrompt(true), 500);
           }
         }

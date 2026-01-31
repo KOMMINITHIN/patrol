@@ -104,12 +104,9 @@ const MapRefHandler = ({ mapRef }) => {
 // Component to fly to location - smooth animation on initial load and locate button
 const FlyToLocation = ({ location, shouldFly, onAnimationEnd }) => {
   const map = useMap();
-  const hasFlewRef = useRef(false);
 
   useEffect(() => {
-    if (location && shouldFly && !hasFlewRef.current) {
-      hasFlewRef.current = true;
-      
+    if (location && shouldFly) {
       // Listen for animation end
       const handleMoveEnd = () => {
         map.off('moveend', handleMoveEnd);
@@ -155,11 +152,8 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
         lat: userLocationProp.lat,
         lng: userLocationProp.lng,
       });
-      // Only fly on first location set
-      if (!hasInitialFlyRef.current) {
-        hasInitialFlyRef.current = true;
-        setShouldFlyToUser(true);
-      }
+      // Always fly when location is granted by user (not automatic)
+      setShouldFlyToUser(true);
     }
   }, [userLocationProp]);
 
