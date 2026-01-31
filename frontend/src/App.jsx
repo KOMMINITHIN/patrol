@@ -91,14 +91,14 @@ function App({ onMount }) {
     // Fetch reports (non-blocking)
     fetchReports();
     
-    // On desktop, request location directly
-    if (!isMobile && !isPWA) {
-      requestLocationPermission().then((result) => {
-        if (result.granted) {
-          getCurrentLocation().then(handleLocationGranted).catch(console.log);
-        }
-      }).catch(console.log);
-    }
+    // Request location on both desktop and mobile/PWA
+    requestLocationPermission().then((result) => {
+      if (result.granted) {
+        getCurrentLocation().then(handleLocationGranted).catch(console.log);
+      } else {
+        console.log('Location permission denied or failed');
+      }
+    }).catch(console.log);
     
     // Subscribe to realtime updates
     const subscription = subscribeToUpdates();

@@ -160,36 +160,8 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true;
 
-  // On mobile, run location logic but don't render UI (like desktop behavior)
-  if (isMobile) {
-    // Still run the permission check logic for mobile
-    const checkPermissionMobile = async () => {
-      try {
-        if ('permissions' in navigator) {
-          const permission = await navigator.permissions.query({ name: 'geolocation' });
-          
-          if (permission.state === 'granted') {
-            try {
-              const location = await getCurrentLocation({ forceRefresh: true });
-              if (onLocationGranted && !hasCalledOnLocationGrantedRef.current) {
-                hasCalledOnLocationGrantedRef.current = true;
-                onLocationGranted(location);
-              }
-              startLocationWatch();
-            } catch (err) {
-              console.log('Mobile location error:', err);
-            }
-          }
-        }
-      } catch (err) {
-        console.log('Mobile permission check error:', err);
-      }
-    };
-    
-    // Run once on mount
-    checkPermissionMobile();
-    return null;
-  }
+  // On mobile, don't render anything - location logic is handled elsewhere
+  if (isMobile) return null;
 
   if (!showPrompt) return null;
 
