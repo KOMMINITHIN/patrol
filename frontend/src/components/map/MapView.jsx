@@ -135,12 +135,15 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
   const navigate = useNavigate();
   const { reports, fetchReports, fetchReportsInBounds, selectReport } = useReportStore();
   const [userLocation, setUserLocation] = useState(userLocationProp);
+  const [smoothedLocation, setSmoothedLocation] = useState(userLocationProp);
+  const locationUpdateTimeoutRef = useRef(null);
   const [selectedPosition, setSelectedPosition] = useState(initialLocation);
   const [shouldFlyToUser, setShouldFlyToUser] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const hasInitialFlyRef = useRef(false);
+  const hasFlownThisMountRef = useRef(false);
 
   const defaultLocation = getDefaultLocation();
   const defaultZoom = parseInt(import.meta.env.VITE_DEFAULT_ZOOM) || 13;
@@ -152,23 +155,49 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
         lat: userLocationProp.lat,
         lng: userLocationProp.lng,
       });
+      setSmoothedLocation({
+        lat: userLocationProp.lat,
+        lng: userLocationProp.lng,
+      });
       // Always fly when location is granted by user (not automatic)
       setShouldFlyToUser(true);
     }
   }, [userLocationProp]);
 
-  // Listen for location updates from App - only update marker, don't fly
+  // Fly to user location when component mounts or when navigating to map page
+  useEffect(() => {
+    if (userLocation && !hasFlownThisMountRef.current) {
+      hasFlownThisMountRef.current = true;
+      setShouldFlyToUser(true);
+    }
+  }, [userLocation]);
+
+  // Listen for location updates from App - smooth marker updates
   useEffect(() => {
     const handleLocationUpdate = (event) => {
       const loc = event.detail;
       if (loc) {
         setUserLocation({ lat: loc.lat, lng: loc.lng });
-        // Don't auto-fly on every update - just update the marker position
+        
+        // Smooth location updates to prevent marker jumping
+        if (locationUpdateTimeoutRef.current) {
+          clearTimeout(locationUpdateTimeoutRef.current);
+        }
+        
+        locationUpdateTimeoutRef.current = setTimeout(() => {
+          setSmoothedLocation({ lat: loc.lat, lng: loc.lng });
+        }, 100); // 100ms delay for smooth updates
       }
     };
     
     window.addEventListener('userLocationUpdated', handleLocationUpdate);
-    return () => window.removeEventListener('userLocationUpdated', handleLocationUpdate);
+    return () => {
+      window.removeEventListener('userLocationUpdated', handleLocationUpdate);
+      if (locationUpdateTimeoutRef.current) {
+        clearTimeout(locationUpdateTimeoutRef.current);
+      }
+      hasFlownThisMountRef.current = false; // Reset for next mount
+    };
   }, []);
 
   useEffect(() => {
@@ -243,6 +272,36 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
                 <p className="font-semibold text-gray-900">Selected Location</p>
                 <p className="text-sm text-gray-500">
                   {selectedPosition.lat.toFixed(6)}, {selectedPosition.lng.toFixed(6)}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* User location marker - shows current GPS position */}
+        {smoothedLocation && !selectionMode && (
+          <Marker
+            position={[smoothedLocation.lat, smoothedLocation.lng]}
+            icon={L.divIcon({
+              className: 'user-location-marker',
+              html: `
+                <div class="user-location-pulse">
+                  <div class="pulse-ring"></div>
+                  <div class="pulse-dot"></div>
+                </div>
+              `,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12],
+            })}
+          >
+            <Popup>
+              <div className="text-center p-2">
+                <p className="font-semibold text-blue-600">Your Location</p>
+                <p className="text-sm text-gray-500">
+                  {smoothedLocation.lat.toFixed(6)}, {smoothedLocation.lng.toFixed(6)}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Live GPS tracking active
                 </p>
               </div>
             </Popup>
