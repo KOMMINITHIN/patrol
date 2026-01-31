@@ -201,7 +201,7 @@ export default function LandingPage() {
 
             <div className="hero-content-block hero-center">
               <div className="hero-content-copy">
-                <h1>ROAD<br />PATROL</h1>
+                <h1>PATROL</h1>
                 <p className="hero-tagline">Report. Track. Resolve.</p>
               </div>
             </div>
