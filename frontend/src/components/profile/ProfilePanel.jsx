@@ -109,31 +109,32 @@ const ProfilePanel = ({ isOpen, onClose }) => {
   return (
     <div 
       ref={panelRef}
-      className="slide-panel-left glass-panel h-full flex flex-col"
+      className="profile-panel-container flex flex-col"
     >
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
-        <div className="flex items-center justify-between">
+      <div className="p-4 pb-0">
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">My Account</h2>
-              <p className="text-xs text-gray-500">Profile & Settings</p>
+              <h2 className="text-lg font-bold text-gray-900">Profile</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Account & Settings</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors mt-0.5"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
+        <div className="border-b border-gray-100 mb-4"></div>
       </div>
 
       {/* Content */}

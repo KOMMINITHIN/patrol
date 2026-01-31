@@ -1,0 +1,238 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@400..900&family=DM+Sans:wght@400;500;600&display=swap");
+
+.features-page-main {
+  background-color: #0a0a0a;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.features-page-main * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.features-page-main img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Intro & Outro Sections */
+.feat-intro,
+.feat-outro {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  background-color: #0a0a0a;
+}
+
+.feat-intro h1,
+.feat-outro h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 500;
+  line-height: 1.1;
+  max-width: 800px;
+  margin-bottom: 1.5rem;
+}
+
+.feat-intro p {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 500px;
+}
+
+.feat-cta-btn {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: #fff;
+  color: #0a0a0a;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.feat-cta-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+}
+
+/* Slider Section */
+.feat-slider {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.feat-slider-images {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.feat-slider-images::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.feat-slider-images img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+}
+
+.feat-slider-title {
+  position: absolute;
+  top: 50%;
+  left: 8%;
+  transform: translateY(-50%);
+  width: 50%;
+  z-index: 100;
+}
+
+.feat-slider-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #fff;
+  text-align: left;
+}
+
+.feat-slider-indicator {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  z-index: 100;
+  height: 350px;
+}
+
+.feat-slider-indices {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.feat-indicator-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+
+.feat-marker {
+  width: 25px;
+  height: 2px;
+  background-color: #fff;
+  transform-origin: right;
+  transform: scaleX(0);
+}
+
+.feat-index {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9rem;
+  opacity: 0.35;
+  color: #fff;
+}
+
+.feat-slider-progress-bar {
+  width: 2px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: relative;
+  border-radius: 2px;
+}
+
+.feat-slider-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .features-page-main {
+    padding-bottom: 80px;
+  }
+
+  .feat-slider-title {
+    width: 85%;
+    left: 5%;
+    top: auto;
+    bottom: 25%;
+    transform: none;
+  }
+
+  .feat-slider-title h1 {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+  }
+
+  .feat-slider-indicator {
+    display: none;
+  }
+
+  .feat-intro h1,
+  .feat-outro h1 {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+  }
+
+  .feat-intro p {
+    font-size: 1rem;
+  }
+
+  .feat-cta-btn {
+    padding: 0.875rem 2rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .feat-slider-title {
+    width: 90%;
+    bottom: 20%;
+  }
+
+  .feat-slider-title h1 {
+    font-size: clamp(1rem, 5vw, 1.5rem);
+  }
+}

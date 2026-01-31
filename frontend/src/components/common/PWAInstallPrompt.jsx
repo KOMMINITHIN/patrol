@@ -14,7 +14,8 @@ const PWAInstallPrompt = () => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowPrompt(true);
+      // Delay showing prompt for better UX
+      setTimeout(() => setShowPrompt(true), 2000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -28,8 +29,8 @@ const PWAInstallPrompt = () => {
     if (showPrompt && promptRef.current) {
       gsap.fromTo(
         promptRef.current,
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
+        { y: 100, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)' }
       );
     }
   }, [showPrompt]);
@@ -53,6 +54,7 @@ const PWAInstallPrompt = () => {
     gsap.to(promptRef.current, {
       y: 100,
       opacity: 0,
+      scale: 0.95,
       duration: 0.3,
       ease: 'power2.in',
       onComplete: () => setShowPrompt(false),
@@ -62,39 +64,70 @@ const PWAInstallPrompt = () => {
   if (!showPrompt) return null;
 
   return (
-    <div
-      ref={promptRef}
-      className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 shadow-2xl z-50 safe-area-bottom"
-    >
-      <div className="max-w-lg mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-              />
-            </svg>
+    <div className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 z-[9998] safe-area-bottom">
+      <div
+        ref={promptRef}
+        className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-sm mx-auto md:mx-0 border border-gray-100"
+        style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+      >
+        {/* Decorative top gradient */}
+        <div className="h-1 bg-gradient-to-r from-primary-500 via-blue-500 to-indigo-500"></div>
+        
+        <div className="p-5">
+          {/* Header with icon and close button */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-base">Install Road Patrol</h3>
+                <p className="text-xs text-gray-500">Get the full experience</p>
+              </div>
+            </div>
+            <button
+              onClick={handleDismiss}
+              className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors -mr-1 -mt-1"
+            >
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <div>
-            <p className="font-semibold">Install Road Patrol</p>
-            <p className="text-sm text-white/80">Add to home screen for quick access</p>
+
+          {/* Benefits */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Offline Access
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Quick Launch
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-full">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Notifications
+            </span>
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleDismiss}
-            className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
-          >
-            Not now
-          </button>
+
+          {/* Install button */}
           <button
             onClick={handleInstall}
-            className="px-4 py-2 bg-white text-primary-700 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
+            className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold text-sm hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/25 active:scale-[0.98] flex items-center justify-center gap-2"
           >
-            Install
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Install App
           </button>
         </div>
       </div>

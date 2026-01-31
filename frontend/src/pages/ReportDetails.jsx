@@ -189,7 +189,7 @@ const ReportDetails = ({ isOverlay = false, onClose }) => {
           </div>
           <p className="text-gray-700 font-semibold mb-1">Report not found</p>
           <p className="text-gray-500 text-sm mb-4">This report may have been removed</p>
-          <button onClick={isOverlay ? onClose : () => navigate('/')} className="btn-primary">
+          <button onClick={isOverlay ? onClose : () => navigate('/app')} className="btn-primary">
             Back to Map
           </button>
         </div>
@@ -201,7 +201,7 @@ const ReportDetails = ({ isOverlay = false, onClose }) => {
     if (isOverlay && onClose) {
       onClose();
     } else {
-      navigate('/');
+      navigate('/app');
     }
   };
 
@@ -473,44 +473,84 @@ const ReportDetails = ({ isOverlay = false, onClose }) => {
 
       {/* Status Update Modal */}
       {showStatusModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={() => setShowStatusModal(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-5">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Update Status</h3>
-              <div className="space-y-2">
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={() => setShowStatusModal(false)}>
+          <div 
+            className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl animate-slide-up safe-area-bottom" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar for mobile */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 bg-gray-300 rounded-full"></div>
+            </div>
+            
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-xl font-bold text-gray-900">Update Status</h3>
+                <button 
+                  onClick={() => setShowStatusModal(false)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-3">
                 {['open', 'in_progress', 'resolved'].map((status) => (
                   <button
                     key={status}
                     onClick={() => handleStatusUpdate(status)}
                     disabled={report.status === status}
-                    className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-4 rounded-2xl border-2 text-left transition-all ${
                       report.status === status
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-primary-500 bg-primary-50 shadow-md'
+                        : 'border-gray-100 bg-gray-50 hover:border-gray-200 hover:bg-white hover:shadow-sm'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className={`${getStatusBadge(status)} capitalize`}>
-                        {status.replace('_', ' ')}
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          status === 'open' ? 'bg-red-100' : 
+                          status === 'in_progress' ? 'bg-yellow-100' : 'bg-green-100'
+                        }`}>
+                          {status === 'open' && (
+                            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                          {status === 'in_progress' && (
+                            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                          {status === 'resolved' && (
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-900 capitalize block">
+                            {status.replace('_', ' ')}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {status === 'open' && 'Issue is awaiting attention'}
+                            {status === 'in_progress' && 'Issue is being addressed'}
+                            {status === 'resolved' && 'Issue has been fixed'}
+                          </span>
+                        </div>
+                      </div>
                       {report.status === status && (
-                        <span className="text-xs text-blue-600 font-medium">Current</span>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                          <span className="text-xs text-primary-600 font-semibold">Current</span>
+                        </div>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {status === 'open' && 'Issue is awaiting attention'}
-                      {status === 'in_progress' && 'Issue is being addressed'}
-                      {status === 'resolved' && 'Issue has been fixed'}
-                    </p>
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setShowStatusModal(false)}
-                className="w-full mt-4 py-3 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>

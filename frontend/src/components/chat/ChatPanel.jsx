@@ -145,45 +145,39 @@ const ChatPanel = ({ isOpen, onClose }) => {
   return (
     <div 
       ref={panelRef}
-      className="slide-panel-left glass-panel h-full flex flex-col"
+      className="chat-panel-container flex flex-col"
     >
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
-        <div className="flex items-center justify-between mb-3">
+      <div className="chat-header p-4 pb-0">
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Global SF Community Chat</h2>
-              <p className="text-xs text-gray-500">Real-time community discussion</p>
+              <h2 className="text-lg font-bold text-gray-900">Community Chat</h2>
+              <div className="flex items-center space-x-3 mt-1">
+                <span className="flex items-center text-sm text-gray-500">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                  {stats.activeUsers} online
+                </span>
+                <span className="text-sm text-gray-400">•</span>
+                <span className="text-sm text-gray-500">{stats.totalMessages} messages</span>
+              </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors mt-0.5"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-
-        {/* Stats */}
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-sm">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-gray-600">{stats.activeUsers} active</span>
-          </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            <span>{stats.totalMessages} messages</span>
-          </div>
-        </div>
+        <div className="border-b border-gray-100 mb-4"></div>
       </div>
 
       {/* Messages */}
@@ -231,7 +225,7 @@ const ChatPanel = ({ isOpen, onClose }) => {
                 key={message.id}
                 className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-3`}
               >
-                <div className={`max-w-[80%] ${isOwn ? 'text-right' : 'text-left'}`}>
+                <div className={`${isOwn ? 'text-right' : 'text-left'}`} style={{ maxWidth: '80%' }}>
                   {/* Username for others */}
                   {!isOwn && (
                     <div className="flex items-center gap-2 mb-1 ml-1">
@@ -243,8 +237,8 @@ const ChatPanel = ({ isOpen, onClose }) => {
                   )}
                   
                   {/* Message bubble */}
-                  <div className={`inline-block ${isOwn ? 'chat-bubble-own' : 'chat-bubble-other'} chat-bubble`}>
-                    <p className="text-sm">{message.content}</p>
+                  <div className={`${isOwn ? 'chat-bubble-own' : 'chat-bubble-other'} chat-bubble`}>
+                    <span className="text-sm">{message.content}</span>
                   </div>
                   
                   {/* Time */}
@@ -259,25 +253,25 @@ const ChatPanel = ({ isOpen, onClose }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-3 bg-gray-50 border-t border-gray-200">
+      {/* Input - Fixed at bottom */}
+      <div className="chat-input-container p-3 border-t border-gray-200/50">
         {!isAuthenticated ? (
           <button
             onClick={signIn}
-            className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white font-medium py-3 rounded-full hover:shadow-lg transition-all"
+            className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-2xl hover:shadow-lg hover:shadow-blue-500/25 transition-all active:scale-[0.98]"
           >
             Sign in to chat
           </button>
         ) : (
-          <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
-            <div className="flex-1 relative">
+          <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+            <div className="flex-1">
               <input
                 ref={inputRef}
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="w-full bg-white border border-gray-200 rounded-full py-3 px-5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full bg-gray-100 md:bg-gray-50 border-0 rounded-full py-3 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder-gray-400"
                 maxLength={500}
                 disabled={isSending}
               />
@@ -285,10 +279,10 @@ const ChatPanel = ({ isOpen, onClose }) => {
             <button
               type="submit"
               disabled={isSending || !newMessage.trim()}
-              className="w-12 h-12 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:shadow-none"
+              className="w-11 h-11 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:shadow-none active:scale-95 flex-shrink-0"
             >
               {isSending ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>

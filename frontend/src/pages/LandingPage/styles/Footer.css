@@ -1,0 +1,153 @@
+/* Footer Section */
+.footer-section {
+    width: 100%;
+    min-height: 80vh;
+    background-color: #0F0F0F;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem 2rem;
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5rem;
+}
+
+/* CTA */
+.footer-cta {
+    text-align: center;
+    max-width: 700px;
+}
+
+.footer-cta h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.footer-cta p {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.cta-button {
+    background-color: #fff;
+    color: #0F0F0F;
+    border: none;
+    padding: 1.25rem 3rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    background-color: #00ff88;
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+}
+
+/* Links */
+.footer-links {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 6rem;
+    flex-wrap: wrap;
+    padding-top: 4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 150px;
+}
+
+.footer-col h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 0.5rem;
+}
+
+.footer-col a {
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-col a:hover {
+    color: #00ff88;
+}
+
+/* Bottom */
+.footer-bottom {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-icon {
+    font-size: 1.5rem;
+}
+
+.logo-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.footer-copyright {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-links {
+        gap: 3rem;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}

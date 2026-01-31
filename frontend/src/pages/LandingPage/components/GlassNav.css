@@ -1,0 +1,237 @@
+/* Top Navigation Bar */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.top-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.top-nav-logo:hover {
+  opacity: 0.7;
+}
+
+.logo-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #ffffff;
+}
+
+.logo-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+/* Hover Zone for Hidden Nav */
+.nav-hover-zone {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 100vh;
+  z-index: 99;
+}
+
+/* Hidden Side Glass Nav */
+.glass-nav {
+  position: fixed;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(-80px);
+  z-index: 100;
+  opacity: 0;
+}
+
+.glass-nav-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: rgba(28, 28, 30, 0.75);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+}
+
+.glass-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: visible;
+}
+
+.glass-nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.glass-nav-item:active {
+  transform: scale(0.94);
+}
+
+.glass-nav-item.active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.glass-nav-icon {
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.65);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.glass-nav-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.glass-nav-item:hover .glass-nav-icon {
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.glass-nav-item.active .glass-nav-icon {
+  color: #ffffff;
+}
+
+/* Label tooltip - minimal text only */
+.glass-nav-label {
+  position: absolute;
+  left: calc(100% + 16px);
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.glass-nav-label.visible {
+  opacity: 1;
+  transform: translateX(0);
+  color: #ffffff;
+}
+
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .top-nav {
+    padding: 1rem 1.25rem;
+  }
+
+  .logo-text {
+    font-size: 1rem;
+  }
+
+  /* Hide side nav on mobile */
+  .glass-nav,
+  .nav-hover-zone {
+    display: none;
+  }
+
+  /* Show mobile bottom nav */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(28, 28, 30, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+  }
+
+  .mobile-nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .mobile-nav-item.active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-nav-icon {
+    width: 24px;
+    height: 24px;
+    color: rgba(255, 255, 255, 0.5);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon,
+  .mobile-nav-item:active .mobile-nav-icon {
+    color: #ffffff;
+  }
+
+  .mobile-nav-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-nav-item.active .mobile-nav-label {
+    color: #ffffff;
+  }
+}

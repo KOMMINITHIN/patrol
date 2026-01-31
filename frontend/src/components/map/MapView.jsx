@@ -287,8 +287,8 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
         {userLocation && <FlyToLocation location={userLocation} />}
       </MapContainer>
 
-      {/* Map controls overlay */}
-      <div className="absolute bottom-6 right-6 z-[1000] flex flex-col space-y-2">
+      {/* Map controls overlay - hidden on mobile */}
+      <div className="absolute bottom-6 right-6 z-[1000] hidden md:flex flex-col space-y-2">
         {/* Locate me button */}
         <button
           onClick={() => {

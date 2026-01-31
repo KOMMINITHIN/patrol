@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.2.2",
+    "@gsap/react": "^2.1.2",
+    "@studio-freight/react-lenis": "^0.0.47",
     "@supabase/supabase-js": "^2.39.0",
     "exif-js": "^2.3.0",
     "gsap": "^3.12.4",

@@ -1,0 +1,303 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@400..900&family=DM+Sans:wght@400;500;600&display=swap");
+
+.about-page-main {
+  background-color: #0a0a0a;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+.about-page-main * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Hero Section */
+.about-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.about-hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about-hero-content {
+  text-align: center;
+  z-index: 2;
+  padding: 2rem;
+}
+
+.about-hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 500;
+  line-height: 0.95;
+  margin-bottom: 2rem;
+}
+
+.about-hero-title span {
+  display: block;
+}
+
+.about-hero-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Stats Section */
+.about-stats {
+  padding: 6rem 2rem;
+  background-color: #0f0f0f;
+}
+
+.about-stats-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.about-stat {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.about-stat:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+}
+
+.about-stat-value {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.about-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Mission Section */
+.about-mission {
+  padding: 8rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-mission-content {
+  max-width: 800px;
+  text-align: center;
+}
+
+.about-mission-content h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.about-mission-content p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+}
+
+/* Team/How It Works Section */
+.about-team {
+  padding: 6rem 2rem;
+  background-color: #0f0f0f;
+  text-align: center;
+}
+
+.about-team h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 500;
+  margin-bottom: 4rem;
+}
+
+.about-team-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.about-team-card {
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.about-team-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-8px);
+}
+
+.about-team-number {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 1.5rem;
+}
+
+.about-team-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.about-team-card p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* CTA Section */
+.about-cta {
+  padding: 8rem 2rem;
+  text-align: center;
+}
+
+.about-cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.about-cta p {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2.5rem;
+}
+
+.about-cta-btn {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background: #fff;
+  color: #0a0a0a;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.about-cta-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-page-main {
+    padding-bottom: 80px;
+  }
+
+  .about-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .about-stat {
+    padding: 1.5rem 1rem;
+  }
+
+  .about-stat-value {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .about-team-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+
+  .about-team-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .about-hero-title {
+    font-size: clamp(2.5rem, 12vw, 5rem);
+  }
+
+  .about-hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .about-mission-content h2 {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+  }
+
+  .about-mission-content p {
+    font-size: 1rem;
+  }
+
+  .about-cta h2 {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .about-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero {
+    padding: 0 1rem;
+  }
+
+  .about-stats,
+  .about-team,
+  .about-cta {
+    padding: 4rem 1.5rem;
+  }
+
+  .about-mission {
+    padding: 5rem 1.5rem;
+  }
+}
