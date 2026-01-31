@@ -101,24 +101,37 @@ const MapRefHandler = ({ mapRef }) => {
   return null;
 };
 
-// Component to fly to location - only on initial load, once per mount
-const FlyToLocation = ({ location, shouldFly }) => {
+// Component to fly to location - smooth animation on initial load and locate button
+const FlyToLocation = ({ location, shouldFly, onAnimationEnd }) => {
   const map = useMap();
   const hasFlewRef = useRef(false);
 
   useEffect(() => {
-    // Only fly once, ever, when shouldFly is true and we haven't flown yet
     if (location && shouldFly && !hasFlewRef.current) {
       hasFlewRef.current = true;
-      // Use setView with animate for smoother initial positioning
-      map.setView([location.lat, location.lng], 15, {
-        animate: true,
-        duration: 0.8,
+      
+      // Listen for animation end
+      const handleMoveEnd = () => {
+        map.off('moveend', handleMoveEnd);
+        if (onAnimationEnd) onAnimationEnd();
+      };
+      map.on('moveend', handleMoveEnd);
+      
+      // Smooth fly animation - 1.8 seconds, nice and smooth
+      map.flyTo([location.lat, location.lng], 15, {
+        duration: 1.8,
+        easeLinearity: 0.2,
       });
     }
-  }, [location, shouldFly, map]);
+  }, [location, shouldFly, map, onAnimationEnd]);
 
   return null;
+};
+
+// Helper to check if map is already at location
+const isAtLocation = (map, lat, lng, tolerance = 0.0005) => {
+  const center = map.getCenter();
+  return Math.abs(center.lat - lat) < tolerance && Math.abs(center.lng - lng) < tolerance;
 };
 
 const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = null, userLocationProp = null }) => {
@@ -127,7 +140,7 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
   const [userLocation, setUserLocation] = useState(userLocationProp);
   const [selectedPosition, setSelectedPosition] = useState(initialLocation);
   const [shouldFlyToUser, setShouldFlyToUser] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const hasInitialFlyRef = useRef(false);
@@ -206,6 +219,8 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
   };
 
   const center = userLocation || defaultLocation;
+  // Start with a slightly zoomed out view so fly animation is more visible
+  const initialZoom = userLocation ? defaultZoom : 11;
 
   return (
     <div 
@@ -214,7 +229,7 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
     >
       <MapContainer
         center={[center.lat, center.lng]}
-        zoom={defaultZoom}
+        zoom={initialZoom}
         className="w-full h-full"
         zoomControl={false}
       >
@@ -328,7 +343,13 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
           ))}
 
         {/* Fly to user location only once on initial load */}
-        {userLocation && <FlyToLocation location={userLocation} shouldFly={shouldFlyToUser} />}
+        {userLocation && (
+          <FlyToLocation 
+            location={userLocation} 
+            shouldFly={shouldFlyToUser} 
+            onAnimationEnd={() => setIsAnimating(false)}
+          />
+        )}
       </MapContainer>
 
       {/* Map controls overlay - hidden on mobile */}
@@ -336,45 +357,41 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
         {/* Locate me button */}
         <button
           onClick={() => {
-            // Prevent multiple clicks while locating
-            if (isLocating) return;
+            // Prevent clicks while animating
+            if (isAnimating) return;
             
             if (navigator.geolocation) {
-              setIsLocating(true);
-              
               navigator.geolocation.getCurrentPosition(
                 (position) => {
                   const newLocation = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                   };
-                  
-                  // Update marker position without triggering FlyToLocation
                   setUserLocation(newLocation);
                   
-                  // Use setView for smooth move without shaking
+                  // Only fly if not already at location (prevents shaking)
                   if (mapRef.current) {
-                    mapRef.current.setView([newLocation.lat, newLocation.lng], 15, {
-                      animate: true,
-                      duration: 0.5,
+                    if (isAtLocation(mapRef.current, newLocation.lat, newLocation.lng)) {
+                      // Already at location - do nothing to prevent shaking
+                      return;
+                    }
+                    // Smooth fly to new location - same animation as initial load
+                    setIsAnimating(true);
+                    mapRef.current.flyTo([newLocation.lat, newLocation.lng], 15, { 
+                      duration: 1.8,
+                      easeLinearity: 0.2,
                     });
+                    // Clear animating state after animation
+                    setTimeout(() => setIsAnimating(false), 1900);
                   }
-                  
-                  setIsLocating(false);
                 },
-                (error) => {
-                  console.log('Location error:', error);
-                  setIsLocating(false);
-                },
-                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 }
+                (error) => console.log('Error:', error)
               );
             }
           }}
-          disabled={isLocating}
-          className={`w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center transition-colors ${
-            isLocating ? 'opacity-70 cursor-wait' : 'hover:bg-gray-50'
-          }`}
+          className={`w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center transition-colors ${isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}`}
           title="Find my location"
+          disabled={isAnimating}
         >
           <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -383,6 +400,47 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
               strokeWidth={2}
               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
             />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Locate Button - Bottom right, above mobile nav */}
+      <div className="absolute bottom-24 right-4 z-[90] md:hidden">
+        <button
+          onClick={() => {
+            if (isAnimating) return;
+            
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const newLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                  };
+                  setUserLocation(newLocation);
+                  
+                  if (mapRef.current) {
+                    if (isAtLocation(mapRef.current, newLocation.lat, newLocation.lng)) {
+                      return;
+                    }
+                    setIsAnimating(true);
+                    mapRef.current.flyTo([newLocation.lat, newLocation.lng], 15, { 
+                      duration: 1.8,
+                      easeLinearity: 0.2,
+                    });
+                    setTimeout(() => setIsAnimating(false), 1900);
+                  }
+                },
+                (error) => console.log('Error:', error)
+              );
+            }
+          }}
+          className={`w-11 h-11 bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center transition-all ${isAnimating ? 'opacity-50' : 'active:scale-95'}`}
+          disabled={isAnimating}
+        >
+          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </button>
