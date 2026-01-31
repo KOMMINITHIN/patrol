@@ -10,12 +10,12 @@ const teamMembers = [
   {
     name: "Nithin Kommi",
     role: "Full Stack Developer",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
+    image: "/nithin.png",
   },
   {
     name: "Likhith V",
     role: "Full Stack Developer",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop",
+    image: "/likhith.png",
   },
 ];
 
