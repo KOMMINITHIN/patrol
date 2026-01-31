@@ -21,6 +21,10 @@ export const useAuthStore = create((set, get) => ({
           isAuthenticated: true,
           isLoading: false,
         });
+        // Clean URL if it contains auth tokens from OAuth redirect
+        if (window.location.hash.includes('access_token')) {
+          window.history.replaceState(null, null, window.location.pathname);
+        }
       } else {
         set({ isLoading: false });
       }
