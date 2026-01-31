@@ -10,19 +10,68 @@
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     
-    <!-- Preconnect to external resources -->
+    <!-- Preconnect to external resources for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preconnect to map tiles for faster map loading -->
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org" />
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org" />
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org" />
+    <!-- DNS prefetch for Supabase (dynamic URL set at build time) -->
+    <link rel="dns-prefetch" href="https://supabase.co" />
+    
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     
     <title>Patrol - Civic Issue Reporter</title>
-    <script type="module" crossorigin src="/assets/index-CNxiTy0o.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B9fmK-oS.css">
+    <style>
+      /* Initial loading indicator - shows before React loads */
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        z-index: 99999;
+        transition: opacity 0.15s ease-out;
+      }
+      #initial-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader-content {
+        text-align: center;
+      }
+      .loader-logo {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 8px;
+      }
+      .loader-text {
+        color: #2563eb;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-Ct4EvvNb.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-ELpXC3Xj.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
   <body>
+    <!-- Initial loader - hidden once React mounts -->
+    <div id="initial-loader">
+      <div class="loader-content">
+        <svg class="loader-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#2563eb"/>
+          <circle cx="12" cy="9" r="2.5" fill="white"/>
+        </svg>
+        <p class="loader-text">Patrol</p>
+      </div>
+    </div>
     <div id="root"></div>
   </body>
 </html>

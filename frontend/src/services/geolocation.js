@@ -9,51 +9,127 @@ const DEFAULT_LOCATION = {
   lng: parseFloat(import.meta.env.VITE_DEFAULT_LNG) || -122.4194,
 };
 
-// Get current user location
-export const getCurrentLocation = () => {
+// Cache for location to avoid repeated requests
+let cachedLocation = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 30000; // 30 seconds cache
+
+// Get current user location with fast fallback strategy
+export const getCurrentLocation = (options = {}) => {
+  const { forceRefresh = false, highAccuracy = false } = options;
+  
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error('Geolocation is not supported by your browser'));
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp,
-        });
-      },
-      (error) => {
+    // Return cached location if valid and not forcing refresh
+    const now = Date.now();
+    if (!forceRefresh && cachedLocation && (now - cacheTimestamp) < CACHE_DURATION) {
+      resolve(cachedLocation);
+      return;
+    }
+
+    // Fast location strategy: try low accuracy first for speed
+    const getLocationWithAccuracy = (enableHighAccuracy, timeout) => {
+      return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const loc = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              timestamp: position.timestamp,
+            };
+            res(loc);
+          },
+          rej,
+          {
+            enableHighAccuracy,
+            timeout,
+            maximumAge: enableHighAccuracy ? 0 : 60000,
+          }
+        );
+      });
+    };
+
+    // Strategy: Fast low-accuracy first (2s), then optionally high-accuracy
+    const fastTimeout = highAccuracy ? 5000 : 3000;
+    
+    getLocationWithAccuracy(highAccuracy, fastTimeout)
+      .then((location) => {
+        cachedLocation = location;
+        cacheTimestamp = Date.now();
+        resolve(location);
+        
+        // If we got low accuracy, try to get better accuracy in background
+        if (!highAccuracy && location.accuracy > 100) {
+          getLocationWithAccuracy(true, 8000)
+            .then((betterLocation) => {
+              cachedLocation = betterLocation;
+              cacheTimestamp = Date.now();
+            })
+            .catch(() => {}); // Silently fail background update
+        }
+      })
+      .catch((error) => {
         let message;
         switch (error.code) {
-          case error.PERMISSION_DENIED:
+          case 1: // PERMISSION_DENIED
             message = 'Location permission denied. Please enable location access.';
             break;
-          case error.POSITION_UNAVAILABLE:
+          case 2: // POSITION_UNAVAILABLE
             message = 'Location information unavailable.';
             break;
-          case error.TIMEOUT:
+          case 3: // TIMEOUT
             message = 'Location request timed out.';
             break;
           default:
             message = 'An unknown error occurred while getting location.';
         }
         reject(new Error(message));
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000,
-      }
-    );
+      });
   });
 };
 
-// Watch user location
-export const watchLocation = (onSuccess, onError) => {
+// Request location permission explicitly (useful for PWA)
+export const requestLocationPermission = async () => {
+  try {
+    // Check if permission API is available
+    if ('permissions' in navigator) {
+      const permission = await navigator.permissions.query({ name: 'geolocation' });
+      if (permission.state === 'granted') {
+        return { granted: true, state: 'granted' };
+      } else if (permission.state === 'prompt') {
+        // Trigger the permission prompt by requesting location
+        try {
+          await getCurrentLocation({ forceRefresh: true });
+          return { granted: true, state: 'granted' };
+        } catch (err) {
+          return { granted: false, state: 'denied', error: err.message };
+        }
+      } else {
+        return { granted: false, state: 'denied' };
+      }
+    } else {
+      // Fallback: just try to get location
+      try {
+        await getCurrentLocation({ forceRefresh: true });
+        return { granted: true, state: 'granted' };
+      } catch (err) {
+        return { granted: false, state: 'denied', error: err.message };
+      }
+    }
+  } catch (err) {
+    return { granted: false, state: 'error', error: err.message };
+  }
+};
+
+// Watch user location with optimized settings
+export const watchLocation = (onSuccess, onError, options = {}) => {
+  const { highAccuracy = false } = options;
+  
   if (!navigator.geolocation) {
     onError(new Error('Geolocation is not supported'));
     return null;
@@ -61,18 +137,22 @@ export const watchLocation = (onSuccess, onError) => {
 
   const watchId = navigator.geolocation.watchPosition(
     (position) => {
-      onSuccess({
+      const loc = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy,
         timestamp: position.timestamp,
-      });
+      };
+      // Update cache
+      cachedLocation = loc;
+      cacheTimestamp = Date.now();
+      onSuccess(loc);
     },
     onError,
     {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 5000,
+      enableHighAccuracy: highAccuracy,
+      timeout: highAccuracy ? 8000 : 5000,
+      maximumAge: highAccuracy ? 0 : 10000,
     }
   );
 

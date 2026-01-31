@@ -1,21 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
+import { useState, useEffect } from 'react';
 
 const PWAInstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const promptRef = useRef(null);
 
   useEffect(() => {
-    // Check if already dismissed
+    // Check if already dismissed or if running as PWA
     const dismissed = localStorage.getItem('pwa_prompt_dismissed');
-    if (dismissed) return;
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true;
+    
+    if (dismissed || isPWA) return;
 
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Delay showing prompt for better UX
-      setTimeout(() => setShowPrompt(true), 2000);
+      // Show prompt quickly - reduced delay for faster UX
+      requestAnimationFrame(() => {
+        setShowPrompt(true);
+        // Trigger animation after mount
+        setTimeout(() => setIsVisible(true), 50);
+      });
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -25,40 +31,29 @@ const PWAInstallPrompt = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (showPrompt && promptRef.current) {
-      gsap.fromTo(
-        promptRef.current,
-        { y: 100, opacity: 0, scale: 0.95 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.5)' }
-      );
-    }
-  }, [showPrompt]);
-
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('PWA installed');
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('PWA installed');
+      }
+    } catch (err) {
+      console.log('Install prompt error:', err);
     }
     
     setDeferredPrompt(null);
-    setShowPrompt(false);
+    setIsVisible(false);
+    setTimeout(() => setShowPrompt(false), 300);
   };
 
   const handleDismiss = () => {
     localStorage.setItem('pwa_prompt_dismissed', 'true');
-    gsap.to(promptRef.current, {
-      y: 100,
-      opacity: 0,
-      scale: 0.95,
-      duration: 0.3,
-      ease: 'power2.in',
-      onComplete: () => setShowPrompt(false),
-    });
+    setIsVisible(false);
+    setTimeout(() => setShowPrompt(false), 300);
   };
 
   if (!showPrompt) return null;
@@ -66,8 +61,9 @@ const PWAInstallPrompt = () => {
   return (
     <div className="fixed bottom-20 md:bottom-6 left-4 right-4 md:left-auto md:right-6 z-[9998] safe-area-bottom">
       <div
-        ref={promptRef}
-        className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-sm mx-auto md:mx-0 border border-gray-100"
+        className={`bg-white rounded-2xl shadow-2xl overflow-hidden max-w-sm mx-auto md:mx-0 border border-gray-100 transition-all duration-300 ease-out ${
+          isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-24 opacity-0 scale-95'
+        }`}
         style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
       >
         {/* Decorative top gradient */}

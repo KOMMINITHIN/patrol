@@ -1,7 +1,6 @@
 import { Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { useEffect, useState } from 'react';
 
 // Pages
 import ReportDetails from './pages/ReportDetails';
@@ -19,11 +18,15 @@ import ChatPanel from './components/chat/ChatPanel';
 import ProfilePanel from './components/profile/ProfilePanel';
 import OfflineBanner from './components/common/OfflineBanner';
 import PWAInstallPrompt from './components/common/PWAInstallPrompt';
+import LocationPermissionPrompt from './components/common/LocationPermissionPrompt';
 
 // Hooks
 import { useAuthStore } from './stores/authStore';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useReportStore } from './stores/reportStore';
+
+// Services
+import { requestLocationPermission, getCurrentLocation } from './services/geolocation';
 
 // Report Details Overlay Component
 function ReportDetailsOverlay() {
@@ -52,17 +55,50 @@ function ReportDetailsOverlay() {
   );
 }
 
-function App() {
+function App({ onMount }) {
   const { initialize, isLoading } = useAuthStore();
   const { fetchReports, subscribeToUpdates } = useReportStore();
   const isOnline = useOnlineStatus();
-  const appRef = useRef(null);
   const location = useLocation();
   const [activePage, setActivePage] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+
+  // Check if mobile or PWA mode early
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const isPWA = typeof window !== 'undefined' && (
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone === true
+  );
+
+  // Hide initial loader on mount
+  useEffect(() => {
+    if (onMount) onMount();
+  }, [onMount]);
+
+  // Handle location granted from prompt
+  const handleLocationGranted = (loc) => {
+    console.log('Location granted:', loc);
+    setUserLocation(loc);
+    // Dispatch custom event so MapView can update
+    window.dispatchEvent(new CustomEvent('userLocationUpdated', { detail: loc }));
+  };
 
   useEffect(() => {
+    // Start initialization in background - don't block render
+    // Initialize auth (non-blocking)
     initialize();
+    
+    // Fetch reports (non-blocking)
     fetchReports();
+    
+    // On desktop, request location directly
+    if (!isMobile && !isPWA) {
+      requestLocationPermission().then((result) => {
+        if (result.granted) {
+          getCurrentLocation().then(handleLocationGranted).catch(console.log);
+        }
+      }).catch(console.log);
+    }
     
     // Subscribe to realtime updates
     const subscription = subscribeToUpdates();
@@ -74,17 +110,6 @@ function App() {
     };
   }, [initialize]);
 
-  useEffect(() => {
-    // GSAP entrance animation
-    if (appRef.current && !isLoading) {
-      gsap.fromTo(
-        appRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.5, ease: 'power2.out' }
-      );
-    }
-  }, [isLoading]);
-
   const handlePageChange = (page) => {
     setActivePage(page);
   };
@@ -93,21 +118,8 @@ function App() {
     setActivePage(null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-100">
-        <div className="text-center">
-          <div className="spinner mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading Patrol...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Check if mobile or PWA mode
-  const isMobile = window.innerWidth < 768;
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                window.navigator.standalone === true;
+  // Note: isMobile and isPWA are already defined above
 
   // On mobile/PWA, skip landing pages and go directly to app
   if (!isMobile && !isPWA) {
@@ -135,7 +147,7 @@ function App() {
 
   // Main App (Dashboard with map)
   return (
-    <div ref={appRef} className="h-screen w-screen overflow-hidden relative">
+    <div className="h-screen w-screen overflow-hidden relative">
       {/* Offline Banner */}
       {!isOnline && <OfflineBanner />}
 
@@ -170,9 +182,12 @@ function App() {
       {/* PWA Install Prompt */}
       <PWAInstallPrompt />
 
+      {/* Location Permission Prompt - Shows on mobile/PWA */}
+      <LocationPermissionPrompt onLocationGranted={handleLocationGranted} />
+
       {/* Main Map View - Always visible */}
       <div className="absolute inset-0 z-0">
-        <MapView />
+        <MapView userLocationProp={userLocation} />
       </div>
 
       {/* Logo/Branding - Desktop - Clickable to Landing Page */}

@@ -2,7 +2,7 @@
   "name": "Patrol",
   "short_name": "Patrol",
   "description": "Report and track civic road issues in your community",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",
@@ -31,7 +31,7 @@
       "name": "Report Issue",
       "short_name": "Report",
       "description": "Report a new road issue",
-      "url": "/?action=create",
+      "url": "/app?action=create",
       "icons": [
         {
           "src": "/icons/icon-192x192.png",

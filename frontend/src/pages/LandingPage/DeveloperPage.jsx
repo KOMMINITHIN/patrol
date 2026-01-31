@@ -5,27 +5,17 @@ import { ReactLenis } from "@studio-freight/react-lenis";
 import GlassNav from "./components/GlassNav";
 import './DeveloperPage.css';
 
-// Team members data - replace with your actual team
+// Team members data
 const teamMembers = [
   {
-    name: "Nithish",
+    name: "Nithin Kommi",
     role: "Full Stack Developer",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
   },
   {
-    name: "Arun",
-    role: "Backend Developer",
+    name: "Likhith V",
+    role: "Full Stack Developer",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop",
-  },
-  {
-    name: "Karthik",
-    role: "UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop",
-  },
-  {
-    name: "Vignesh",
-    role: "Mobile Developer",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop",
   },
 ];
 

@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import gsap from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import { useReportStore } from '../../stores/reportStore';
-import { getDefaultLocation } from '../../services/geolocation';
+import { getDefaultLocation, getCurrentLocation } from '../../services/geolocation';
 
 // Fix Leaflet default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -91,62 +90,103 @@ const MapEventHandler = ({ onMapClick, onBoundsChange }) => {
   return null;
 };
 
-// Component to fly to location
-const FlyToLocation = ({ location }) => {
+// Component to capture map reference
+const MapRefHandler = ({ mapRef }) => {
   const map = useMap();
+  
+  useEffect(() => {
+    mapRef.current = map;
+  }, [map, mapRef]);
+  
+  return null;
+};
+
+// Component to fly to location - only on initial load, once per mount
+const FlyToLocation = ({ location, shouldFly }) => {
+  const map = useMap();
+  const hasFlewRef = useRef(false);
 
   useEffect(() => {
-    if (location) {
-      map.flyTo([location.lat, location.lng], 15, {
-        duration: 1.5,
+    // Only fly once, ever, when shouldFly is true and we haven't flown yet
+    if (location && shouldFly && !hasFlewRef.current) {
+      hasFlewRef.current = true;
+      // Use setView with animate for smoother initial positioning
+      map.setView([location.lat, location.lng], 15, {
+        animate: true,
+        duration: 0.8,
       });
     }
-  }, [location, map]);
+  }, [location, shouldFly, map]);
 
   return null;
 };
 
-const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = null }) => {
+const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = null, userLocationProp = null }) => {
   const navigate = useNavigate();
   const { reports, fetchReports, fetchReportsInBounds, selectReport } = useReportStore();
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(userLocationProp);
   const [selectedPosition, setSelectedPosition] = useState(initialLocation);
+  const [shouldFlyToUser, setShouldFlyToUser] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const hasInitialFlyRef = useRef(false);
 
   const defaultLocation = getDefaultLocation();
   const defaultZoom = parseInt(import.meta.env.VITE_DEFAULT_ZOOM) || 13;
+
+  // Update user location when prop changes (from LocationPermissionPrompt)
+  useEffect(() => {
+    if (userLocationProp) {
+      setUserLocation({
+        lat: userLocationProp.lat,
+        lng: userLocationProp.lng,
+      });
+      // Only fly on first location set
+      if (!hasInitialFlyRef.current) {
+        hasInitialFlyRef.current = true;
+        setShouldFlyToUser(true);
+      }
+    }
+  }, [userLocationProp]);
+
+  // Listen for location updates from App - only update marker, don't fly
+  useEffect(() => {
+    const handleLocationUpdate = (event) => {
+      const loc = event.detail;
+      if (loc) {
+        setUserLocation({ lat: loc.lat, lng: loc.lng });
+        // Don't auto-fly on every update - just update the marker position
+      }
+    };
+    
+    window.addEventListener('userLocationUpdated', handleLocationUpdate);
+    return () => window.removeEventListener('userLocationUpdated', handleLocationUpdate);
+  }, []);
 
   useEffect(() => {
     // Fetch initial reports
     fetchReports({ excludeResolved: true });
 
-    // Get user location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
+    // Get user location using optimized service (if not already provided)
+    if (!userLocationProp) {
+      getCurrentLocation()
+        .then((location) => {
           setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+            lat: location.lat,
+            lng: location.lng,
           });
-        },
-        (error) => {
+          // Fly to user on initial load
+          if (!hasInitialFlyRef.current) {
+            hasInitialFlyRef.current = true;
+            setShouldFlyToUser(true);
+          }
+        })
+        .catch((error) => {
           console.log('Geolocation error:', error.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+        });
     }
-  }, []);
-
-  useEffect(() => {
-    // GSAP animation for map container
-    if (mapContainerRef.current) {
-      gsap.fromTo(
-        mapContainerRef.current,
-        { opacity: 0, scale: 0.98 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }
-      );
-    }
-  }, []);
+  }, [userLocationProp]);
 
   const handleMapClick = (latlng) => {
     if (selectionMode && onLocationSelect) {
@@ -168,13 +208,17 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
   const center = userLocation || defaultLocation;
 
   return (
-    <div ref={mapContainerRef} className="w-full h-full relative">
+    <div 
+      ref={mapContainerRef} 
+      className="w-full h-full relative"
+    >
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={defaultZoom}
         className="w-full h-full"
         zoomControl={false}
       >
+        <MapRefHandler mapRef={mapRef} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -283,8 +327,8 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
             </Marker>
           ))}
 
-        {/* Fly to user location on load */}
-        {userLocation && <FlyToLocation location={userLocation} />}
+        {/* Fly to user location only once on initial load */}
+        {userLocation && <FlyToLocation location={userLocation} shouldFly={shouldFlyToUser} />}
       </MapContainer>
 
       {/* Map controls overlay - hidden on mobile */}
@@ -292,19 +336,44 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
         {/* Locate me button */}
         <button
           onClick={() => {
+            // Prevent multiple clicks while locating
+            if (isLocating) return;
+            
             if (navigator.geolocation) {
+              setIsLocating(true);
+              
               navigator.geolocation.getCurrentPosition(
                 (position) => {
-                  setUserLocation({
+                  const newLocation = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
-                  });
+                  };
+                  
+                  // Update marker position without triggering FlyToLocation
+                  setUserLocation(newLocation);
+                  
+                  // Use setView for smooth move without shaking
+                  if (mapRef.current) {
+                    mapRef.current.setView([newLocation.lat, newLocation.lng], 15, {
+                      animate: true,
+                      duration: 0.5,
+                    });
+                  }
+                  
+                  setIsLocating(false);
                 },
-                (error) => console.log('Error:', error)
+                (error) => {
+                  console.log('Location error:', error);
+                  setIsLocating(false);
+                },
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 }
               );
             }
           }}
-          className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+          disabled={isLocating}
+          className={`w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center transition-colors ${
+            isLocating ? 'opacity-70 cursor-wait' : 'hover:bg-gray-50'
+          }`}
           title="Find my location"
         >
           <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

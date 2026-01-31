@@ -16,7 +16,7 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
-        start_url: '/',
+        start_url: '/app',
         scope: '/',
         icons: [
           {
@@ -35,8 +35,43 @@ export default defineConfig({
         categories: ['social', 'utilities']
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        // Skip waiting for faster updates
+        skipWaiting: true,
+        clientsClaim: true,
+        // Optimize caching patterns
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        // Navigation preload for faster page loads
+        navigationPreload: true,
+        // Clean up old caches
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          // Cache fonts
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-stylesheets',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // Cache map tiles - high priority for PWA
           {
             urlPattern: /^https:\/\/[abc]\.tile\.openstreetmap\.org\/.*/i,
             handler: 'CacheFirst',
@@ -51,26 +86,64 @@ export default defineConfig({
               }
             }
           },
+          // Cache Supabase API - NetworkFirst for fresh data with fast fallback
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 50,
+                maxEntries: 100,
                 maxAgeSeconds: 5 * 60 // 5 minutes
               },
-              networkTimeoutSeconds: 10
+              networkTimeoutSeconds: 5, // Faster timeout - fallback to cache quicker
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
             }
           },
+          // Cache Supabase storage (photos) - CacheFirst for speed
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'report-photos',
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // Cache Leaflet resources
+          {
+            urlPattern: /^https:\/\/unpkg\.com\/leaflet.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'leaflet-resources',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          // Cache CDN resources (marker icons etc)
+          {
+            urlPattern: /^https:\/\/cdnjs\.cloudflare\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cdn-resources',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }
