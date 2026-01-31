@@ -103,7 +103,7 @@ export default function AboutPage() {
               <span>Cities</span>
             </h1>
             <p className="about-hero-subtitle">
-              Road Patrol empowers communities to identify, report, and resolve civic issues together.
+              Patrol empowers communities to identify, report, and resolve civic issues together.
             </p>
           </div>
         </section>
@@ -126,7 +126,7 @@ export default function AboutPage() {
             <h2>Our Mission</h2>
             <p>
               We believe that every citizen deserves safe roads and well-maintained public infrastructure.
-              Road Patrol bridges the gap between communities and local authorities, making it easier
+              Patrol bridges the gap between communities and local authorities, making it easier
               than ever to report issues and track their resolution.
             </p>
             <p>

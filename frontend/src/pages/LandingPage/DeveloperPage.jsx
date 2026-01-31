@@ -156,7 +156,7 @@ export default function DeveloperPage() {
               </a>
             </div>
             <div className="dev-footer-right">
-              <a href="mailto:hello@roadpatrol.app">Contact</a>
+              <a href="mailto:hello@patrol.app">Contact</a>
               <a href="#">Documentation</a>
             </div>
           </div>

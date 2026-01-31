@@ -137,7 +137,7 @@ export default function FeaturesPage() {
         {/* Intro Section */}
         <section className="feat-intro">
           <h1>Powerful Features<br />Built for Communities</h1>
-          <p>Scroll to explore how Road Patrol empowers citizens to improve their neighborhoods.</p>
+          <p>Scroll to explore how Patrol empowers citizens to improve their neighborhoods.</p>
         </section>
 
         {/* Slider Section */}

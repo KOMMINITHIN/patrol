@@ -195,7 +195,7 @@ export default function MenuOverlay({ isOpen, onClose }) {
             <a onClick={() => handleNavClick('/login')}>Sign In</a>
           </div>
           <div className="menu-footer-right">
-            <span>© 2026 Road Patrol</span>
+            <span>© 2026 Patrol</span>
           </div>
         </div>
       </div>

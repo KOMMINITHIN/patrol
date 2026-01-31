@@ -1,6 +1,6 @@
 {
-  "name": "Road Patrol",
-  "short_name": "RoadPatrol",
+  "name": "Patrol",
+  "short_name": "Patrol",
   "description": "Report and track civic road issues in your community",
   "start_url": "/",
   "display": "standalone",

@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'icons/icon-192x192.png', 'icons/icon-512x512.png'],
       manifest: {
-        name: 'Road Patrol - Civic Issue Reporter',
-        short_name: 'Road Patrol',
+        name: 'Patrol - Civic Issue Reporter',
+        short_name: 'Patrol',
         description: 'Report and track civic issues in your community',
         theme_color: '#2563EB',
         background_color: '#ffffff',

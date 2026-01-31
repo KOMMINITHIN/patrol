@@ -36,7 +36,7 @@ export default function FooterSection() {
                 {/* CTA */}
                 <div className="footer-cta footer-reveal">
                     <h1>Make your city safer.</h1>
-                    <p>Join Road Patrol and start reporting issues in your community today.</p>
+                    <p>Join Patrol and start reporting issues in your community today.</p>
                     <button className="cta-button" onClick={() => navigate('/login')}>
                         Get Started Free
                     </button>
@@ -71,9 +71,9 @@ export default function FooterSection() {
                 <div className="footer-bottom footer-reveal">
                     <div className="footer-logo">
                         <span className="logo-icon">🛣️</span>
-                        <span className="logo-text">Road Patrol</span>
+                        <span className="logo-text">Patrol</span>
                     </div>
-                    <p className="footer-copyright">© 2026 Road Patrol. All rights reserved.</p>
+                    <p className="footer-copyright">© 2026 Patrol. All rights reserved.</p>
                 </div>
             </div>
         </footer>

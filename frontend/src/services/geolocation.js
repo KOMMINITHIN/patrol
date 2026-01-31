@@ -93,7 +93,7 @@ export const reverseGeocode = async (lat, lng) => {
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
       {
         headers: {
-          'User-Agent': 'RoadPatrol/1.0',
+          'User-Agent': 'Patrol/1.0',
         },
       }
     );
@@ -153,7 +153,7 @@ export const searchAddress = async (query, limit = 5) => {
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=${limit}&addressdetails=1`,
       {
         headers: {
-          'User-Agent': 'RoadPatrol/1.0',
+          'User-Agent': 'Patrol/1.0',
         },
       }
     );

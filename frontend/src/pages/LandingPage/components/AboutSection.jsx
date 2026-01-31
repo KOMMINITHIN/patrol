@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Feature labels for Road Patrol
+// Feature labels for Patrol
 const featureData = [
     { label: "Report", top: 25, left: 15 },
     { label: "Track", top: 12.5, left: 50 },

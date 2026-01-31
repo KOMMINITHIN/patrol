@@ -90,7 +90,7 @@ const Navbar = () => {
                 </svg>
               </div>
               <span className="text-xl font-bold text-gray-900 hidden sm:block">
-                Road Patrol
+                Patrol
               </span>
             </Link>
 

@@ -98,7 +98,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-100">
         <div className="text-center">
           <div className="spinner mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading Road Patrol...</p>
+          <p className="text-gray-600 font-medium">Loading Patrol...</p>
         </div>
       </div>
     );
@@ -177,13 +177,13 @@ function App() {
 
       {/* Logo/Branding - Desktop - Clickable to Landing Page */}
       <div className="absolute top-4 left-4 md:left-16 z-[50] hidden md:block">
-        <a href="/" className="text-xl font-bold text-primary-700 tracking-wide hover:text-primary-800 transition-colors cursor-pointer" style={{fontFamily: "'Cinzel', serif"}}>Road Patrol</a>
+        <a href="/" className="text-xl font-bold text-primary-700 tracking-wide hover:text-primary-800 transition-colors cursor-pointer" style={{fontFamily: "'Cinzel', serif"}}>Patrol</a>
       </div>
 
       {/* Mobile Logo/Branding - Top Left */}
       <div className="absolute top-3 left-3 z-[50] md:hidden">
         <div className="glass-brand rounded-xl py-2 px-3.5 shadow-lg">
-          <span className="text-sm font-bold bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent tracking-wide" style={{fontFamily: "'Cinzel', serif"}}>Road Patrol</span>
+          <span className="text-sm font-bold bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent tracking-wide" style={{fontFamily: "'Cinzel', serif"}}>Patrol</span>
         </div>
       </div>
 
