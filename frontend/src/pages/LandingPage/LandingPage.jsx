@@ -189,12 +189,12 @@ export default function LandingPage() {
 
           <div className="marker marker-1" ref={marker1Ref}>
             <span className="marker-icon"></span>
-            <p className="marker-label">POTHOLE</p>
+            <p className="marker-label">plastic</p>
           </div>
 
           <div className="marker marker-2" ref={marker2Ref}>
             <span className="marker-icon"></span>
-            <p className="marker-label">DEBRIS</p>
+            <p className="marker-label">Fish Nets</p>
           </div>
 
           <div className="hero-content" ref={heroContentRef}>
