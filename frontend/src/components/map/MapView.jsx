@@ -354,7 +354,7 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
 
       {/* Map controls overlay - hidden on mobile */}
       <div className="absolute bottom-6 right-6 z-[1000] hidden md:flex flex-col space-y-2">
-        {/* Locate me button */}
+        {/* Locate me button - desktop only */}
         <button
           onClick={() => {
             // Prevent clicks while animating
@@ -400,47 +400,6 @@ const MapView = ({ onLocationSelect, selectionMode = false, initialLocation = nu
               strokeWidth={2}
               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
             />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Mobile Locate Button - Bottom right, above mobile nav */}
-      <div className="absolute bottom-24 right-4 z-[90] md:hidden">
-        <button
-          onClick={() => {
-            if (isAnimating) return;
-            
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(
-                (position) => {
-                  const newLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                  };
-                  setUserLocation(newLocation);
-                  
-                  if (mapRef.current) {
-                    if (isAtLocation(mapRef.current, newLocation.lat, newLocation.lng)) {
-                      return;
-                    }
-                    setIsAnimating(true);
-                    mapRef.current.flyTo([newLocation.lat, newLocation.lng], 15, { 
-                      duration: 1.8,
-                      easeLinearity: 0.2,
-                    });
-                    setTimeout(() => setIsAnimating(false), 1900);
-                  }
-                },
-                (error) => console.log('Error:', error)
-              );
-            }
-          }}
-          className={`w-11 h-11 bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center transition-all ${isAnimating ? 'opacity-50' : 'active:scale-95'}`}
-          disabled={isAnimating}
-        >
-          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </button>

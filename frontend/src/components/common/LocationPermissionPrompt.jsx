@@ -1,12 +1,43 @@
-import { useState, useEffect } from 'react';
-import { getCurrentLocation } from '../../services/geolocation';
+import { useState, useEffect, useRef } from 'react';
+import { getCurrentLocation, watchLocation, clearLocationWatch } from '../../services/geolocation';
 
 const LocationPermissionPrompt = ({ onLocationGranted }) => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [permissionState, setPermissionState] = useState('unknown');
+  const watchIdRef = useRef(null);
+  const hasGrantedRef = useRef(false);
+
+  // Start watching location for continuous updates
+  const startLocationWatch = () => {
+    if (watchIdRef.current) return; // Already watching
+    
+    watchIdRef.current = watchLocation(
+      (location) => {
+        if (onLocationGranted) onLocationGranted(location);
+      },
+      (error) => {
+        console.log('Watch location error:', error);
+      },
+      { highAccuracy: true }
+    );
+  };
+
+  // Cleanup watch on unmount
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current) {
+        clearLocationWatch(watchIdRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768 || 
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
     // Check current permission state
     const checkPermission = async () => {
       try {
@@ -15,37 +46,56 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
           const permission = await navigator.permissions.query({ name: 'geolocation' });
           setPermissionState(permission.state);
           
+          // Listen for permission changes
+          permission.onchange = () => {
+            setPermissionState(permission.state);
+            if (permission.state === 'granted') {
+              hasGrantedRef.current = true;
+              setShowPrompt(false);
+              startLocationWatch();
+            } else if (permission.state === 'denied') {
+              // On denied, show prompt again on mobile so user knows to enable in settings
+              if (isMobile) {
+                setShowPrompt(true);
+              }
+            }
+          };
+          
           if (permission.state === 'granted') {
-            // Already have permission, get location
+            hasGrantedRef.current = true;
+            // Already have permission, start watching location
             try {
-              const location = await getCurrentLocation();
+              const location = await getCurrentLocation({ forceRefresh: true });
               if (onLocationGranted) onLocationGranted(location);
+              // Start continuous watch
+              startLocationWatch();
             } catch (err) {
               console.log('Error getting location:', err);
             }
             return;
           } else if (permission.state === 'prompt') {
-            // Need to ask for permission - show prompt on mobile
-            const isMobile = window.innerWidth < 768 || 
-              /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
+            // Need to ask for permission - show prompt on mobile/PWA
             if (isMobile) {
               // Delay slightly to let the app render first
               setTimeout(() => setShowPrompt(true), 500);
             } else {
               // On desktop, try to get location directly (browser will show its own prompt)
               try {
-                const location = await getCurrentLocation();
+                const location = await getCurrentLocation({ forceRefresh: true });
                 if (onLocationGranted) onLocationGranted(location);
+                startLocationWatch();
               } catch (err) {
                 console.log('Desktop location error:', err);
               }
             }
+          } else if (permission.state === 'denied') {
+            // If denied on mobile, show prompt to guide user to settings
+            if (isMobile) {
+              setTimeout(() => setShowPrompt(true), 500);
+            }
           }
-          // If denied, don't show our prompt
         } else {
           // Permissions API not available, show prompt on mobile
-          const isMobile = window.innerWidth < 768;
           if (isMobile) {
             setTimeout(() => setShowPrompt(true), 500);
           }
@@ -53,7 +103,6 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
       } catch (err) {
         console.log('Permission check error:', err);
         // Show prompt as fallback on mobile
-        const isMobile = window.innerWidth < 768;
         if (isMobile) {
           setTimeout(() => setShowPrompt(true), 500);
         }
@@ -70,29 +119,19 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
       // This will trigger the browser's permission prompt
       const location = await getCurrentLocation({ forceRefresh: true });
       setPermissionState('granted');
+      hasGrantedRef.current = true;
       setShowPrompt(false);
       if (onLocationGranted) onLocationGranted(location);
+      // Start continuous location watching
+      startLocationWatch();
     } catch (err) {
       console.log('Location request error:', err);
       setPermissionState('denied');
-      // Keep prompt visible but show error state
+      // Keep prompt visible but show error state - user needs to enable in settings
     } finally {
       setIsRequesting(false);
     }
   };
-
-  const handleDismiss = () => {
-    setShowPrompt(false);
-    // Store that user dismissed, don't show again for this session
-    sessionStorage.setItem('location_prompt_dismissed', 'true');
-  };
-
-  // Don't show if already dismissed this session
-  useEffect(() => {
-    if (sessionStorage.getItem('location_prompt_dismissed')) {
-      setShowPrompt(false);
-    }
-  }, []);
 
   if (!showPrompt) return null;
 
@@ -153,7 +192,7 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
             </div>
           )}
 
-          {/* Buttons */}
+          {/* Button */}
           <div className="space-y-2">
             <button
               onClick={handleEnableLocation}
@@ -165,6 +204,14 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Getting Location...
                 </>
+              ) : permissionState === 'denied' ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Open Settings to Enable
+                </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,12 +221,11 @@ const LocationPermissionPrompt = ({ onLocationGranted }) => {
                 </>
               )}
             </button>
-            <button
-              onClick={handleDismiss}
-              className="w-full py-2.5 text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors"
-            >
-              Maybe Later
-            </button>
+            {permissionState === 'denied' && (
+              <p className="text-xs text-gray-500 text-center">
+                Go to your browser/app settings and enable location for this site
+              </p>
+            )}
           </div>
         </div>
       </div>
