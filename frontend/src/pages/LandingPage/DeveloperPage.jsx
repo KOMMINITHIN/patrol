@@ -17,6 +17,21 @@ const teamMembers = [
     role: "Full Stack Developer",
     image: "/likhith.png",
   },
+  {
+    name: "Chinmayee A",
+    role: "UI/UX Designer",
+    image: "/thu.png",
+  },
+  {
+    name: "Harshith Reddy",
+    role: "Backend Developer",
+    image: "/chanmi.png",
+  },
+  {
+    name: "Vamsi",
+    role: "Frontend Developer",
+    image: "/vamsi.png",
+  },
 ];
 
 const techStack = [
